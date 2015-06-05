@@ -64,7 +64,9 @@ def main():
 		resultado = neural_test.calc_y(entrada[x])
 		erro = float(valor_esperado[x]) - resultado
 
-		print erro
+		print "Valor esperado: %f" %float(valor_esperado[x])
+		print "Resultado obtido: %f" %resultado
+		print "Erro: %f" %erro
     
 def gerar_pesos_aleatorios(matriz):
 	#Wi,j -> peso do neuronio i para o neuronio j
@@ -103,7 +105,7 @@ class NeuralNetwork:
 			total = 0.0
 			for j in range(self.nos_escondidos):
 				total += self.matriz_y_escondida[k] * self.peso_escondido[j][k]
-			self.matriz_y_saida = tanh(total)
+			self.matriz_y_saida = total
 			
 		return self.matriz_y_saida                            
 				
