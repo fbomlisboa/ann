@@ -16,11 +16,12 @@ def parser_csv():
 	
 	f = open(sys.argv[1], 'rt')
 	entrada = []
+	valor_esperado = []
 	try:
 		reader = csv.reader(f)
 		for row in reader:
 			if row[2] == 'jan': row[2] = 1
-			if row[2] == 'fev': row[2] = 2
+			if row[2] == 'feb': row[2] = 2
 			if row[2] == 'mar': row[2] = 3
 			if row[2] == 'apr': row[2] = 4
 			if row[2] == 'may': row[2] = 5
@@ -39,9 +40,10 @@ def parser_csv():
 			if row[3] == 'sat': row[3] = 6
 			if row[3] == 'sun': row[3] = 7
 			entrada.append(row[:-1])
+			valor_esperado.append(row[12])
 	finally:
 		f.close()
-	return entrada
+	return entrada , valor_esperado
 
 def cria_matriz(i,j):
   m = []
@@ -50,13 +52,20 @@ def cria_matriz(i,j):
   return m
   
 def main():
-	entrada = parser_csv()
+	entrada , valor_esperado = parser_csv()
 	neural_test = NeuralNetwork(12,9,1)
-	print neural_test.peso_entrada
+	
+	print "Matriz de pesos da camada de entrada:"
+  	print neural_test.peso_entrada
+	print "Matriz de pesos da camada escondida:"
 	print neural_test.peso_escondido
 	
-	print neural_test.calc_y(entrada[1])
+	for x in range(1,len(entrada)):
+		resultado = neural_test.calc_y(entrada[x])
+		erro = float(valor_esperado[x]) - resultado
 
+		print erro
+    
 def gerar_pesos_aleatorios(matriz):
 	#Wi,j -> peso do neuronio i para o neuronio j
 	for i in range(len(matriz)):
