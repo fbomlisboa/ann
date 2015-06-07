@@ -10,7 +10,6 @@ def tanh(y):
 	return math.tanh(y)
 
 def sigmoid(x):
-	round(x,2)
  	return 1.0 / (1.0 + math.exp(-x))
 
 def dsigmoid(x):
@@ -28,27 +27,8 @@ def parser_csv():
 	try:
 		reader = csv.reader(f)
 		for row in reader:
-			# if row[2] == 'jan': row[2] = 1
-			# if row[2] == 'feb': row[2] = 2
-			# if row[2] == 'mar': row[2] = 3
-			# if row[2] == 'apr': row[2] = 4
-			# if row[2] == 'may': row[2] = 5
-			# if row[2] == 'jun': row[2] = 6
-			# if row[2] == 'jul': row[2] = 7
-			# if row[2] == 'aug': row[2] = 8
-			# if row[2] == 'sep': row[2] = 9
-			# if row[2] == 'oct': row[2] = 10
-			# if row[2] == 'nov': row[2] = 11
-			# if row[2] == 'dec': row[2] = 12
-			# if row[3] == 'mon': row[3] = 1
-			# if row[3] == 'tue': row[3] = 2
-			# if row[3] == 'wed': row[3] = 3
-			# if row[3] == 'thu': row[3] = 4
-			# if row[3] == 'fri': row[3] = 5
-			# if row[3] == 'sat': row[3] = 6
-			# if row[3] == 'sun': row[3] = 7
 			entrada.append(row[:-1])
-			valor_esperado.append(row[6])
+			valor_esperado.append(row[11])
 	finally:
 		f.close()
 	return entrada , valor_esperado
@@ -61,27 +41,8 @@ def parser_csv2():
 	try:
 		reader = csv.reader(f)
 		for row in reader:
-			# if row[2] == 'jan': row[2] = 1
-			# if row[2] == 'feb': row[2] = 2
-			# if row[2] == 'mar': row[2] = 3
-			# if row[2] == 'apr': row[2] = 4
-			# if row[2] == 'may': row[2] = 5
-			# if row[2] == 'jun': row[2] = 6
-			# if row[2] == 'jul': row[2] = 7
-			# if row[2] == 'aug': row[2] = 8
-			# if row[2] == 'sep': row[2] = 9
-			# if row[2] == 'oct': row[2] = 10
-			# if row[2] == 'nov': row[2] = 11
-			# if row[2] == 'dec': row[2] = 12
-			# if row[3] == 'mon': row[3] = 1
-			# if row[3] == 'tue': row[3] = 2
-			# if row[3] == 'wed': row[3] = 3
-			# if row[3] == 'thu': row[3] = 4
-			# if row[3] == 'fri': row[3] = 5
-			# if row[3] == 'sat': row[3] = 6
-			# if row[3] == 'sun': row[3] = 7
 			entrada.append(row[:-1])
-			valor_esperado.append(row[6])
+			valor_esperado.append(row[11])
 	finally:
 		f.close()
 	return entrada , valor_esperado	
@@ -95,7 +56,7 @@ def cria_matriz(i,j):
 def main():
 	entrada , valor_esperado = parser_csv()
 	entrada2, valor_esperado2 = parser_csv2()
-	neural_test = NeuralNetwork(6,6,1)
+	neural_test = NeuralNetwork(12,12,1)
 	
 	print "Matriz de pesos da camada de entrada:"
 	print neural_test.peso_entrada
@@ -110,7 +71,7 @@ def main():
 	
 	grupo_de_treinamento = []
 	valor_esperado_treinamento = []
-	for i in range(len(entrada)):
+	for i in range(1,len(entrada)):
 		grupo_de_treinamento.append(entrada[i])
 		valor_esperado_treinamento.append(float(valor_esperado[i]))
 	
@@ -149,7 +110,9 @@ class NeuralNetwork:
 		
 	def calc_y(self,entrada):
 		
+		print entrada
 		for i in range(self.nos_entrada-1):
+			print entrada[i] , i
 			self.matriz_entrada[i] = entrada[i]
 
 		#camada de entrada -> camada escondida
