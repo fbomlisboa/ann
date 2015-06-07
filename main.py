@@ -9,9 +9,16 @@ import time
 def tanh(y):
 	return math.tanh(y)
 
+def sigmoid(x):
+	round(x,2)
+ 	return 1.0 / (1.0 + math.exp(-x))
+
+def dsigmoid(x):
+	return x*(1.0 - x)
+
 #derivada da tanh dado que y é tanh(y)
 def dtanh(y):
-	return 1 - y**2
+	return 1.0 - y**2
 
 def parser_csv():
 	
@@ -46,6 +53,39 @@ def parser_csv():
 		f.close()
 	return entrada , valor_esperado
 
+def parser_csv2():
+	
+	f = open(sys.argv[2], 'rt')
+	entrada = []
+	valor_esperado = []
+	try:
+		reader = csv.reader(f)
+		for row in reader:
+			# if row[2] == 'jan': row[2] = 1
+			# if row[2] == 'feb': row[2] = 2
+			# if row[2] == 'mar': row[2] = 3
+			# if row[2] == 'apr': row[2] = 4
+			# if row[2] == 'may': row[2] = 5
+			# if row[2] == 'jun': row[2] = 6
+			# if row[2] == 'jul': row[2] = 7
+			# if row[2] == 'aug': row[2] = 8
+			# if row[2] == 'sep': row[2] = 9
+			# if row[2] == 'oct': row[2] = 10
+			# if row[2] == 'nov': row[2] = 11
+			# if row[2] == 'dec': row[2] = 12
+			# if row[3] == 'mon': row[3] = 1
+			# if row[3] == 'tue': row[3] = 2
+			# if row[3] == 'wed': row[3] = 3
+			# if row[3] == 'thu': row[3] = 4
+			# if row[3] == 'fri': row[3] = 5
+			# if row[3] == 'sat': row[3] = 6
+			# if row[3] == 'sun': row[3] = 7
+			entrada.append(row[:-1])
+			valor_esperado.append(row[6])
+	finally:
+		f.close()
+	return entrada , valor_esperado	
+
 def cria_matriz(i,j):
   m = []
   for k in range(i):
@@ -54,6 +94,7 @@ def cria_matriz(i,j):
   
 def main():
 	entrada , valor_esperado = parser_csv()
+	entrada2, valor_esperado2 = parser_csv2()
 	neural_test = NeuralNetwork(6,6,1)
 	
 	print "Matriz de pesos da camada de entrada:"
@@ -63,17 +104,17 @@ def main():
 	
 	grupo_de_teste = []
 	valor_esperado_teste = []
-	for i in range(0,200):
-		grupo_de_teste.append(entrada[i])
-		valor_esperado_teste.append(float(valor_esperado[i]))
+	for i in range(len(entrada2)):
+		grupo_de_teste.append(entrada2[i])
+		valor_esperado_teste.append(float(valor_esperado2[i]))
 	
 	grupo_de_treinamento = []
 	valor_esperado_treinamento = []
-	for i in range(201,307):
+	for i in range(len(entrada)):
 		grupo_de_treinamento.append(entrada[i])
 		valor_esperado_treinamento.append(float(valor_esperado[i]))
 	
-	neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,1000,0.2,0.005)
+	neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,3000,0.2,0.1)
 	neural_test.teste(grupo_de_teste,valor_esperado_teste)
 	
 	print "Matriz de pesos da camada de entrada final:"
@@ -116,6 +157,7 @@ class NeuralNetwork:
 			total = 0.0
 			for j in range(self.nos_entrada-1):
 				total += float(entrada[j]) * self.peso_entrada[j][i]
+				# print total
 			self.matriz_y_escondida[i] = tanh(total)
 		
 		#camada escondida -> camada de saida
@@ -133,7 +175,6 @@ class NeuralNetwork:
 		delta_saida = [0.0]*self.nos_saida
 		for i in range(self.nos_saida):
 			delta_saida[i] = saida_esperada - self.matriz_y_saida
-			# print "Delta saida[%d]: %f"%(i,delta_saida[i])
 		
 		#calculando erros (deltas) da camada escondida
 		delta_escondido = [0.0]*self.nos_escondidos
@@ -142,7 +183,6 @@ class NeuralNetwork:
 			for j in range(self.nos_saida):
 				erro += delta_saida[j] * self.peso_escondido[i][j]
 			delta_escondido[i] = dtanh(self.matriz_y_escondida[i]) * erro
-			# print "Delta escondido[%d]: %f "%(i,delta_escondido[i])
 
 		#atualizando pesos da camada escondida
 		for i in range(self.nos_escondidos):
@@ -162,13 +202,11 @@ class NeuralNetwork:
 		return erro
 			
 	def treino(self,entrada,valor_esperado,epocas,N,erro_max):
-		erro = 0.0
 		for i in range(0,epocas):
+			erro = 0.0
 			for j in range(0,len(entrada)):
 				r = self.calc_y(entrada[j])
 				tmp = self.retroPropagacao(valor_esperado[j],N)
-				# print "Erro: %f da iteração %d da época %d" %(tmp,j,i)
-				# time.sleep(2)
 				erro += tmp
 			if erro < erro_max:
 				print "Erro: %f" %erro
