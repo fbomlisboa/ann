@@ -25,10 +25,10 @@ def parser_csv():
 	entrada = []
 	valor_esperado = []
 	try:
-		reader = csv.reader(f, delimiter = ';')
+		reader = csv.reader(f, delimiter=',')
 		for row in reader:
 			entrada.append(row[:-1])
-			valor_esperado.append(row[5])
+			valor_esperado.append(row[8])
 	finally:
 		f.close()
 	return entrada , valor_esperado
@@ -39,10 +39,10 @@ def parser_csv2():
 	entrada = []
 	valor_esperado = []
 	try:
-		reader = csv.reader(f, delimiter = ';')
+		reader = csv.reader(f, delimiter=',')
 		for row in reader:
 			entrada.append(row[:-1])
-			valor_esperado.append(row[5])
+			valor_esperado.append(row[8])
 	finally:
 		f.close()
 	return entrada , valor_esperado	
@@ -56,16 +56,17 @@ def cria_matriz(i,j):
 def main():
 	entrada , valor_esperado = parser_csv()
 	entrada2, valor_esperado2 = parser_csv2()
-	neural_test = NeuralNetwork(5,4,1)
+	neural_test = NeuralNetwork(8,8,1)
 	
-	print "Matriz de pesos da camada de entada:"
+	print "Matriz de pesos da camada de entrada:"
 	print neural_test.peso_entrada
 	print "Matriz de pesos da camada escondida:"
 	print neural_test.peso_escondido
 	
 	grupo_de_teste = []
 	valor_esperado_teste = []
-	for i in range(len(entrada2)):
+	for i in range(1,len(entrada2)):
+	#for i in 0,20:
 		grupo_de_teste.append(entrada2[i])
 		valor_esperado_teste.append(float(valor_esperado2[i]))
 	
@@ -75,7 +76,7 @@ def main():
 		grupo_de_treinamento.append(entrada[i])
 		valor_esperado_treinamento.append(float(valor_esperado[i]))
 	
-	neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.1,0.1)
+	neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
 	neural_test.teste(grupo_de_teste,valor_esperado_teste)
 	
 	print "Matriz de pesos da camada de entrada final:"
@@ -171,9 +172,9 @@ class NeuralNetwork:
 				r = self.calc_y(entrada[j])
 				tmp = self.retroPropagacao(valor_esperado[j],N)
 				erro += tmp
-			if erro < erro_max:
-				print "Erro: %f" %erro
-				break
+			#if erro < erro_max:
+			print "Erro: %f" %erro
+			#	break
 	
 	def teste(self,entrada,valor_esperado):
 		for i in range(len(entrada)):
