@@ -32,8 +32,7 @@ def parser_csv(escolhaDataset): #treino
 		arquivo = "train_data_KAHRAMAN.csv" # https://archive.ics.uci.edu/ml/datasets/User+Knowledge+Modeling
 	elif escolhaDataset == '4':
 		arquivo = "breast-cancer-wisconsin.train" # https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Original)
-	elif escolhaDataset == '5':
-		arquivo = ""
+
 	f = open(arquivo, 'rt')
 	try:
 		reader = csv.reader(f, delimiter=',')
@@ -73,8 +72,7 @@ def parser_csv2(escolhaDataset): #testes
 		arquivo = "test_data_KAHRAMAN.csv" 
 	elif escolhaDataset == '4':
 		arquivo = "breast-cancer-wisconsin.data"
-	elif escolhaDataset == '5':
-		arquivo = ""
+
 	f = open(arquivo, 'rt')
 	try:
 		reader = csv.reader(f, delimiter=',')
@@ -92,9 +90,7 @@ def parser_csv2(escolhaDataset): #testes
 				elif escolhaDataset == '4':
 					entrada.append(row[1:-1]) #excluindo a 1a coluna
 					valor_esperado.append(row[9])
-				elif escolhaDataset == '5':
-					entrada.append(row[1:-1]) #excluindo a 1a coluna
-					valor_esperado.append(row[6])
+
 	finally:
 		f.close()
 	return entrada , valor_esperado	
@@ -106,7 +102,7 @@ def cria_matriz(i,j):
   return m
   
 def main():
-	if len(sys.argv) == 2:
+	if len(sys.argv) >= 2:
 		escolhaDataset = sys.argv[1]
 		entrada , valor_esperado = parser_csv(escolhaDataset)
 		entrada2, valor_esperado2 = parser_csv2(escolhaDataset)
@@ -126,6 +122,8 @@ def main():
 		
 		grupo_de_teste = []
 		valor_esperado_teste = []
+		comite = [[0 for x in range(3)] for x in range(3)] 
+		
 		for i in range(1,len(entrada2)):
 		#for i in 0,20:
 			grupo_de_teste.append(entrada2[i])
@@ -146,13 +144,42 @@ def main():
 		elif escolhaDataset == '4':
 			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.05)
 		
+		if len(sys.argv) == 3:
+			print "Preparando comite para o dataset 4:"
+			print "1a rodada:"
 		
-		neural_test.teste(grupo_de_teste,valor_esperado_teste,escolhaDataset)
+		comite[0][0] = neural_test.teste(grupo_de_teste,valor_esperado_teste,escolhaDataset)
+		comite[0][1] = neural_test.peso_entrada
+		comite[0][2] = neural_test.peso_escondido
+			
+		if len(sys.argv) == 3:
+			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,1000,0.05,0.03)				
+			comite[1][0] = neural_test.teste(grupo_de_teste,valor_esperado_teste,escolhaDataset)
+			comite[1][1] = neural_test.peso_entrada
+			comite[1][2] = neural_test.peso_escondido
+			
+			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,20,0.1,0.1)
+			comite[2][0] = neural_test.teste(grupo_de_teste,valor_esperado_teste,escolhaDataset)
+			comite[2][1] = neural_test.peso_entrada
+			comite[2][2] = neural_test.peso_escondido
+
+			melhorComite = 0.0
+			indiceMelhorComite = 0
+			for i in range(0, 3):
+				print "Taxa do comite %d: %f" %(i, comite[i][0])
+				if comite[i][0] > melhorComite:
+					melhorComite = comite[i][0]
+					indiceMelhorComite = i
+				
+			print "Melhor taxa de acerto: %.2f" %comite[indiceMelhorComite][0]
+		
+		else:
+			indiceMelhorComite = 0
 	
 		print "Matriz de pesos da camada de entrada final:"
-		print neural_test.peso_entrada
+		print comite[indiceMelhorComite][1] 
 		print "Matriz de pesos da camada escondida final:"
-		print neural_test.peso_escondido
+		print comite[indiceMelhorComite][2] 
 	else:
 		print "Modo de uso: $ python main.py [DATASET]" 
 		print ""
@@ -161,6 +188,8 @@ def main():
 		print "2- Crustaceo Abalone [Idade] - 100 epochs, N = 0.01, erro = 0.005"
 		print "3- Conhecimento dos Estudantes [Baixo..Alto] - 20 epochs, N = 0.1, erro = 0.1"
 		print "4- Cancer de Mama [2:Benigno, 4:Maligno] - 100 epochs, N = 0.01, erro = 0.05"
+		print ""
+		print "Para testar o comite do dataset 4, digite $ python main.py 4 C"
 	
 	
 def gerar_pesos_aleatorios(matriz):
@@ -272,6 +301,7 @@ class NeuralNetwork:
 			print "Valor esperado: %f || Valor obtido: %f" %(valor_esperado[i],y)
 		taxaAcerto = float(erroSoma)/float(len(entrada))
 		print "TAXA DE ACERTO FINAL: %.2f" %taxaAcerto
+		return taxaAcerto
 	  
 if __name__ == '__main__':
 	main()
