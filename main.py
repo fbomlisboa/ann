@@ -117,10 +117,7 @@ def main():
 		elif escolhaDataset == '3':
 			neural_test = NeuralNetwork(5,4,1)
 		elif escolhaDataset == '4':
-			neural_test = NeuralNetwork(9,10,1)
-		elif escolhaDataset == '5':
-			neural_test = NeuralNetwork(6,5,1)
-		
+			neural_test = NeuralNetwork(9,10,1)		
 		
 		print "Matriz de pesos da camada de entrada:"
 		print neural_test.peso_entrada
@@ -148,16 +145,14 @@ def main():
 			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,20,0.1,0.1)
 		elif escolhaDataset == '4':
 			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.05)
-		elif escolhaDataset == '5':
-			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.1,0.005)
 		
 		
-		neural_test.teste(grupo_de_teste,valor_esperado_teste)
+		neural_test.teste(grupo_de_teste,valor_esperado_teste,escolhaDataset)
 	
-		#print "Matriz de pesos da camada de entrada final:"
-		#print neural_test.peso_entrada
-		#print "Matriz de pesos da camada escondida final:"
-		#print neural_test.peso_escondido
+		print "Matriz de pesos da camada de entrada final:"
+		print neural_test.peso_entrada
+		print "Matriz de pesos da camada escondida final:"
+		print neural_test.peso_escondido
 	else:
 		print "Modo de uso: $ python main.py [DATASET]" 
 		print ""
@@ -254,14 +249,29 @@ class NeuralNetwork:
 				r = self.calc_y(entrada[j])
 				tmp = self.retroPropagacao(valor_esperado[j],N)
 				erro += tmp
-			#if erro < erro_max:
-			print "Erro: %f" %erro
-			#	break
+			if erro < erro_max:
+				print "Erro: %f" %erro
+				break
 	
-	def teste(self,entrada,valor_esperado):
+	def teste(self,entrada,valor_esperado,escolhaDataset):
+		erroSoma = 0
 		for i in range(len(entrada)):
-			y = self.calc_y(entrada[i])
+			y = self.calc_y(entrada[i])			
+			if escolhaDataset == '1':
+				if abs(valor_esperado[i] - y) < 0.1:
+					erroSoma += 1
+			elif escolhaDataset == '2':
+				if abs(valor_esperado[i] - y) < 0.5:
+					erroSoma += 1
+			elif escolhaDataset == '3':
+				if abs(valor_esperado[i] - y) < 0.5:
+					erroSoma += 1
+			elif escolhaDataset == '4':
+				if abs(valor_esperado[i] - y) < 0.5:
+					erroSoma += 1
 			print "Valor esperado: %f || Valor obtido: %f" %(valor_esperado[i],y)
+		taxaAcerto = float(erroSoma)/float(len(entrada))
+		print "TAXA DE ACERTO FINAL: %.2f" %taxaAcerto
 	  
 if __name__ == '__main__':
 	main()
