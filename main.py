@@ -25,10 +25,10 @@ def parser_csv():
 	entrada = []
 	valor_esperado = []
 	try:
-		reader = csv.reader(f)
+		reader = csv.reader(f, delimiter = ';')
 		for row in reader:
 			entrada.append(row[:-1])
-			valor_esperado.append(row[11])
+			valor_esperado.append(row[5])
 	finally:
 		f.close()
 	return entrada , valor_esperado
@@ -39,10 +39,10 @@ def parser_csv2():
 	entrada = []
 	valor_esperado = []
 	try:
-		reader = csv.reader(f)
+		reader = csv.reader(f, delimiter = ';')
 		for row in reader:
 			entrada.append(row[:-1])
-			valor_esperado.append(row[11])
+			valor_esperado.append(row[5])
 	finally:
 		f.close()
 	return entrada , valor_esperado	
@@ -56,9 +56,9 @@ def cria_matriz(i,j):
 def main():
 	entrada , valor_esperado = parser_csv()
 	entrada2, valor_esperado2 = parser_csv2()
-	neural_test = NeuralNetwork(12,12,1)
+	neural_test = NeuralNetwork(5,4,1)
 	
-	print "Matriz de pesos da camada de entrada:"
+	print "Matriz de pesos da camada de entada:"
 	print neural_test.peso_entrada
 	print "Matriz de pesos da camada escondida:"
 	print neural_test.peso_escondido
@@ -75,7 +75,7 @@ def main():
 		grupo_de_treinamento.append(entrada[i])
 		valor_esperado_treinamento.append(float(valor_esperado[i]))
 	
-	neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,3000,0.2,0.1)
+	neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.1,0.1)
 	neural_test.teste(grupo_de_teste,valor_esperado_teste)
 	
 	print "Matriz de pesos da camada de entrada final:"
@@ -110,9 +110,9 @@ class NeuralNetwork:
 		
 	def calc_y(self,entrada):
 		
-		print entrada
+		#print entrada
 		for i in range(self.nos_entrada-1):
-			print entrada[i] , i
+			#print entrada[i] , i
 			self.matriz_entrada[i] = entrada[i]
 
 		#camada de entrada -> camada escondida
