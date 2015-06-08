@@ -19,34 +19,83 @@ def dsigmoid(x):
 def dtanh(y):
 	return 1.0 - y**2
 
-def parser_csv():
+def parser_csv(escolhaDataset): #treino
 	
-	f = open(sys.argv[1], 'rt')
+	#f = open(sys.argv[1], 'rt')
 	entrada = []
 	valor_esperado = []
+	arquivo = ""
+	if escolhaDataset == '1':
+		arquivo = "train_diagnosis.csv"
+	elif escolhaDataset == '2':
+		arquivo = "abalone.train"
+	elif escolhaDataset == '3':
+		arquivo = "train_data_KAHRAMAN.csv"
+	elif escolhaDataset == '4':
+		arquivo = "breast-cancer-wisconsin.train"
+	elif escolhaDataset == '5':
+		arquivo = ""
+	f = open(arquivo, 'rt')
 	try:
 		reader = csv.reader(f, delimiter=',')
 		for row in reader:
 			if '?' not in row:
-				#entrada.append(row[:-1]) #todas as colunas
-				entrada.append(row[1:-1]) #excluindo a 1a coluna
-				valor_esperado.append(row[6])
+				if escolhaDataset == '1':
+					entrada.append(row[1:-1]) #excluindo a 1a coluna
+					valor_esperado.append(row[6])
+				elif escolhaDataset == '2':
+					entrada.append(row[:-1]) #todas as colunas
+					valor_esperado.append(row[8])
+				elif escolhaDataset == '3':
+					entrada.append(row[:-1]) #todas as colunas
+					valor_esperado.append(row[5])
+				elif escolhaDataset == '4':
+					entrada.append(row[1:-1]) #excluindo a 1a coluna
+					valor_esperado.append(row[9])
+				elif escolhaDataset == '5':
+					entrada.append(row[1:-1]) #excluindo a 1a coluna
+					valor_esperado.append(row[6])
+				
 	finally:
 		f.close()
 	return entrada , valor_esperado
 
-def parser_csv2():
+def parser_csv2(escolhaDataset): #testes
 	
-	f = open(sys.argv[2], 'rt')
+	#f = open(sys.argv[2], 'rt')
 	entrada = []
 	valor_esperado = []
+	arquivo = ""
+	if escolhaDataset == '1':
+		arquivo = "test_diagnosis.csv"
+	elif escolhaDataset == '2':
+		arquivo = "abalone.data"
+	elif escolhaDataset == '3':
+		arquivo = "test_data_KAHRAMAN.csv"
+	elif escolhaDataset == '4':
+		arquivo = "breast-cancer-wisconsin.data"
+	elif escolhaDataset == '5':
+		arquivo = ""
+	f = open(arquivo, 'rt')
 	try:
 		reader = csv.reader(f, delimiter=',')
 		for row in reader:
 			if '?' not in row:
-				#entrada.append(row[:-1]) #todas as colunas
-				entrada.append(row[1:-1]) #excluindo a 1a coluna
-				valor_esperado.append(row[6])
+				if escolhaDataset == '1':
+					entrada.append(row[1:-1]) #excluindo a 1a coluna
+					valor_esperado.append(row[6])
+				elif escolhaDataset == '2':
+					entrada.append(row[:-1]) #todas as colunas
+					valor_esperado.append(row[8])
+				elif escolhaDataset == '3':
+					entrada.append(row[:-1]) #todas as colunas
+					valor_esperado.append(row[5])
+				elif escolhaDataset == '4':
+					entrada.append(row[1:-1]) #excluindo a 1a coluna
+					valor_esperado.append(row[9])
+				elif escolhaDataset == '5':
+					entrada.append(row[1:-1]) #excluindo a 1a coluna
+					valor_esperado.append(row[6])
 	finally:
 		f.close()
 	return entrada , valor_esperado	
@@ -58,9 +107,20 @@ def cria_matriz(i,j):
   return m
   
 def main():
-	entrada , valor_esperado = parser_csv()
-	entrada2, valor_esperado2 = parser_csv2()
-	neural_test = NeuralNetwork(6,5,1)
+	escolhaDataset = sys.argv[1]
+	entrada , valor_esperado = parser_csv(escolhaDataset)
+	entrada2, valor_esperado2 = parser_csv2(escolhaDataset)
+	if escolhaDataset == '1':
+		neural_test = NeuralNetwork(6,5,1)
+	elif escolhaDataset == '2':
+		neural_test = NeuralNetwork(8,8,1)
+	elif escolhaDataset == '3':
+		neural_test = NeuralNetwork(5,4,1)
+	elif escolhaDataset == '4':
+		neural_test = NeuralNetwork(9,10,1)
+	elif escolhaDataset == '5':
+		neural_test = NeuralNetwork(6,5,1)
+	
 	
 	print "Matriz de pesos da camada de entrada:"
 	print neural_test.peso_entrada
@@ -80,7 +140,18 @@ def main():
 		grupo_de_treinamento.append(entrada[i])
 		valor_esperado_treinamento.append(float(valor_esperado[i]))
 	
-	neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
+	if escolhaDataset == '1':
+		neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
+	elif escolhaDataset == '2':
+		neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
+	elif escolhaDataset == '3':
+		neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,20,0.1,0.1)
+	elif escolhaDataset == '4':
+		neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.1,0.05)
+	elif escolhaDataset == '5':
+		neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
+	
+	
 	neural_test.teste(grupo_de_teste,valor_esperado_teste)
 	
 	#print "Matriz de pesos da camada de entrada final:"
