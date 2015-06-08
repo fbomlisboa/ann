@@ -21,18 +21,17 @@ def dtanh(y):
 
 def parser_csv(escolhaDataset): #treino
 	
-	#f = open(sys.argv[1], 'rt')
 	entrada = []
 	valor_esperado = []
 	arquivo = ""
 	if escolhaDataset == '1':
-		arquivo = "train_diagnosis.csv"
+		arquivo = "train_diagnosis.csv" # https://archive.ics.uci.edu/ml/datasets/Acute+Inflammations
 	elif escolhaDataset == '2':
-		arquivo = "abalone.train"
+		arquivo = "abalone.train" # https://archive.ics.uci.edu/ml/datasets/Abalone
 	elif escolhaDataset == '3':
-		arquivo = "train_data_KAHRAMAN.csv"
+		arquivo = "train_data_KAHRAMAN.csv" # https://archive.ics.uci.edu/ml/datasets/User+Knowledge+Modeling
 	elif escolhaDataset == '4':
-		arquivo = "breast-cancer-wisconsin.train"
+		arquivo = "breast-cancer-wisconsin.train" # https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Original)
 	elif escolhaDataset == '5':
 		arquivo = ""
 	f = open(arquivo, 'rt')
@@ -41,8 +40,8 @@ def parser_csv(escolhaDataset): #treino
 		for row in reader:
 			if '?' not in row:
 				if escolhaDataset == '1':
-					entrada.append(row[1:-1]) #excluindo a 1a coluna
-					valor_esperado.append(row[6])
+					entrada.append(row[1:-2]) #excluindo a 1a e ultima coluna
+					valor_esperado.append(row[5])
 				elif escolhaDataset == '2':
 					entrada.append(row[:-1]) #todas as colunas
 					valor_esperado.append(row[8])
@@ -71,7 +70,7 @@ def parser_csv2(escolhaDataset): #testes
 	elif escolhaDataset == '2':
 		arquivo = "abalone.data"
 	elif escolhaDataset == '3':
-		arquivo = "test_data_KAHRAMAN.csv"
+		arquivo = "test_data_KAHRAMAN.csv" 
 	elif escolhaDataset == '4':
 		arquivo = "breast-cancer-wisconsin.data"
 	elif escolhaDataset == '5':
@@ -82,8 +81,8 @@ def parser_csv2(escolhaDataset): #testes
 		for row in reader:
 			if '?' not in row:
 				if escolhaDataset == '1':
-					entrada.append(row[1:-1]) #excluindo a 1a coluna
-					valor_esperado.append(row[6])
+					entrada.append(row[1:-2]) #excluindo a 1a e ultima coluna
+					valor_esperado.append(row[5])
 				elif escolhaDataset == '2':
 					entrada.append(row[:-1]) #todas as colunas
 					valor_esperado.append(row[8])
@@ -107,57 +106,66 @@ def cria_matriz(i,j):
   return m
   
 def main():
-	escolhaDataset = sys.argv[1]
-	entrada , valor_esperado = parser_csv(escolhaDataset)
-	entrada2, valor_esperado2 = parser_csv2(escolhaDataset)
-	if escolhaDataset == '1':
-		neural_test = NeuralNetwork(6,5,1)
-	elif escolhaDataset == '2':
-		neural_test = NeuralNetwork(8,8,1)
-	elif escolhaDataset == '3':
-		neural_test = NeuralNetwork(5,4,1)
-	elif escolhaDataset == '4':
-		neural_test = NeuralNetwork(9,10,1)
-	elif escolhaDataset == '5':
-		neural_test = NeuralNetwork(6,5,1)
+	if len(sys.argv) == 2:
+		escolhaDataset = sys.argv[1]
+		entrada , valor_esperado = parser_csv(escolhaDataset)
+		entrada2, valor_esperado2 = parser_csv2(escolhaDataset)
+		if escolhaDataset == '1':
+			neural_test = NeuralNetwork(5,5,1)
+		elif escolhaDataset == '2':
+			neural_test = NeuralNetwork(8,8,1)
+		elif escolhaDataset == '3':
+			neural_test = NeuralNetwork(5,4,1)
+		elif escolhaDataset == '4':
+			neural_test = NeuralNetwork(9,10,1)
+		elif escolhaDataset == '5':
+			neural_test = NeuralNetwork(6,5,1)
+		
+		
+		print "Matriz de pesos da camada de entrada:"
+		print neural_test.peso_entrada
+		print "Matriz de pesos da camada escondida:"
+		print neural_test.peso_escondido
+		
+		grupo_de_teste = []
+		valor_esperado_teste = []
+		for i in range(1,len(entrada2)):
+		#for i in 0,20:
+			grupo_de_teste.append(entrada2[i])
+			valor_esperado_teste.append(float(valor_esperado2[i]))
+		
+		grupo_de_treinamento = []
+		valor_esperado_treinamento = []
+		for i in range(1,len(entrada)):
+			grupo_de_treinamento.append(entrada[i])
+			valor_esperado_treinamento.append(float(valor_esperado[i]))
+		
+		if escolhaDataset == '1':
+			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
+		elif escolhaDataset == '2':
+			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
+		elif escolhaDataset == '3':
+			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,20,0.1,0.1)
+		elif escolhaDataset == '4':
+			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.05)
+		elif escolhaDataset == '5':
+			neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.1,0.005)
+		
+		
+		neural_test.teste(grupo_de_teste,valor_esperado_teste)
 	
-	
-	print "Matriz de pesos da camada de entrada:"
-	print neural_test.peso_entrada
-	print "Matriz de pesos da camada escondida:"
-	print neural_test.peso_escondido
-	
-	grupo_de_teste = []
-	valor_esperado_teste = []
-	for i in range(1,len(entrada2)):
-	#for i in 0,20:
-		grupo_de_teste.append(entrada2[i])
-		valor_esperado_teste.append(float(valor_esperado2[i]))
-	
-	grupo_de_treinamento = []
-	valor_esperado_treinamento = []
-	for i in range(1,len(entrada)):
-		grupo_de_treinamento.append(entrada[i])
-		valor_esperado_treinamento.append(float(valor_esperado[i]))
-	
-	if escolhaDataset == '1':
-		neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
-	elif escolhaDataset == '2':
-		neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
-	elif escolhaDataset == '3':
-		neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,20,0.1,0.1)
-	elif escolhaDataset == '4':
-		neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.1,0.05)
-	elif escolhaDataset == '5':
-		neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
-	
-	
-	neural_test.teste(grupo_de_teste,valor_esperado_teste)
-	
-	#print "Matriz de pesos da camada de entrada final:"
-	#print neural_test.peso_entrada
-	#print "Matriz de pesos da camada escondida final:"
-	#print neural_test.peso_escondido    
+		#print "Matriz de pesos da camada de entrada final:"
+		#print neural_test.peso_entrada
+		#print "Matriz de pesos da camada escondida final:"
+		#print neural_test.peso_escondido
+	else:
+		print "Modo de uso: $ python main.py [DATASET]" 
+		print ""
+		print "Escolha o dataset:"
+		print "1- Inflamacao da Bexiga [0:Nao, 1:Sim] - 100 epochs, N = 0.01, erro = 0.005"
+		print "2- Crustaceo Abalone [Idade] - 100 epochs, N = 0.01, erro = 0.005"
+		print "3- Conhecimento dos Estudantes [Baixo..Alto] - 20 epochs, N = 0.1, erro = 0.1"
+		print "4- Cancer de Mama [2:Benigno, 4:Maligno] - 100 epochs, N = 0.01, erro = 0.05"
 	
 	
 def gerar_pesos_aleatorios(matriz):
