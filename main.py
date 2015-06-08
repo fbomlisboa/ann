@@ -27,8 +27,10 @@ def parser_csv():
 	try:
 		reader = csv.reader(f, delimiter=',')
 		for row in reader:
-			entrada.append(row[:-1])
-			valor_esperado.append(row[8])
+			if '?' not in row:
+				#entrada.append(row[:-1]) #todas as colunas
+				entrada.append(row[1:-1]) #excluindo a 1a coluna
+				valor_esperado.append(row[10])
 	finally:
 		f.close()
 	return entrada , valor_esperado
@@ -41,8 +43,10 @@ def parser_csv2():
 	try:
 		reader = csv.reader(f, delimiter=',')
 		for row in reader:
-			entrada.append(row[:-1])
-			valor_esperado.append(row[8])
+			if '?' not in row:
+				#entrada.append(row[:-1]) #todas as colunas
+				entrada.append(row[1:-1]) #excluindo a 1a coluna
+				valor_esperado.append(row[10])
 	finally:
 		f.close()
 	return entrada , valor_esperado	
@@ -56,7 +60,7 @@ def cria_matriz(i,j):
 def main():
 	entrada , valor_esperado = parser_csv()
 	entrada2, valor_esperado2 = parser_csv2()
-	neural_test = NeuralNetwork(8,8,1)
+	neural_test = NeuralNetwork(9,10,1)
 	
 	print "Matriz de pesos da camada de entrada:"
 	print neural_test.peso_entrada
@@ -76,13 +80,13 @@ def main():
 		grupo_de_treinamento.append(entrada[i])
 		valor_esperado_treinamento.append(float(valor_esperado[i]))
 	
-	neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.01,0.005)
+	neural_test.treino(grupo_de_treinamento,valor_esperado_treinamento,100,0.1,0.05)
 	neural_test.teste(grupo_de_teste,valor_esperado_teste)
 	
-	print "Matriz de pesos da camada de entrada final:"
-	print neural_test.peso_entrada
-	print "Matriz de pesos da camada escondida final:"
-	print neural_test.peso_escondido    
+	#print "Matriz de pesos da camada de entrada final:"
+	#print neural_test.peso_entrada
+	#print "Matriz de pesos da camada escondida final:"
+	#print neural_test.peso_escondido    
 	
 	
 def gerar_pesos_aleatorios(matriz):
@@ -112,14 +116,13 @@ class NeuralNetwork:
 	def calc_y(self,entrada):
 		
 		#print entrada
-		for i in range(self.nos_entrada-1):
-			#print entrada[i] , i
+		for i in range(self.nos_entrada-1):			
 			self.matriz_entrada[i] = entrada[i]
 
 		#camada de entrada -> camada escondida
 		for i in range(self.nos_escondidos-1):
 			total = 0.0
-			for j in range(self.nos_entrada-1):
+			for j in range(self.nos_entrada-1):				
 				total += float(entrada[j]) * self.peso_entrada[j][i]
 				# print total
 			self.matriz_y_escondida[i] = tanh(total)
